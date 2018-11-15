@@ -184,7 +184,10 @@ comment   #.*
 <LONG_STRING,LONG_STRING2>.            { ; }
 <LONG_STRING,LONG_STRING2><<EOF>>      { display_error("unterminated long string at EOF"); }
 
-{string}   { return STRING; }
+{string}   { 
+             yylval.str = new char[yyleng + 1];
+             strcpy(yylval.str, yytext);
+             return STRING; }
 
 
 "("        { left_enclose();  return LPAR; }

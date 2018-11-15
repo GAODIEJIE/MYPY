@@ -1,7 +1,7 @@
 #include "node.h"
 #include "poolOfNodes.h"
-#include <math.h>
 #include <string>
+#include <math.h>
 
 #define PRECISION 1000
 
@@ -12,12 +12,12 @@ public:
   virtual const Literal* operator+(const Literal& rhs) const =0;
   virtual const Literal* opPlus(float) const =0;
   virtual const Literal* opPlus(int) const =0;
-  //virtual const Literal* opPlus(std::string) const =0;
+  virtual const Literal* opPlus(std::string) const =0;
 
   virtual const Literal* operator*(const Literal& rhs) const =0;
   virtual const Literal* opMult(float) const =0;
   virtual const Literal* opMult(int) const =0;
-  //virtual const Literal* opMult(std::string) const =0;
+  virtual const Literal* opMult(std::string) const =0;
   
   virtual const Literal* operator-(const Literal& rhs) const =0;
   virtual const Literal* opSubt(float) const =0;
@@ -60,6 +60,109 @@ public:
 };
 
 class IntLiteral;
+class StringLiteral: public Literal{
+public:
+  StringLiteral(std::string _val): val(_val) {}
+
+  virtual const Literal* operator+(const Literal& rhs) const  {
+    return rhs.opPlus(val);
+  }
+  virtual const Literal* opPlus(std::string lhs) const {
+    const Literal* node = new StringLiteral(lhs + val);
+    PoolOfNodes::getInstance().add(node);
+    return node;
+  }
+  virtual const Literal* opPlus(float lhs) const  {
+    throw std::string("Can't do * for string");
+    return nullptr;
+  }
+  virtual const Literal* opPlus(int lhs) const  {
+    throw std::string("Can't do * for string");
+    return nullptr;
+  }
+
+  virtual const Literal* operator-(const Literal& rhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+  virtual const Literal* opSubt(float lhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+  virtual const Literal* opSubt(int lhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+
+  virtual const Literal* operator*(const Literal& rhs) const  {
+    return rhs.opMult(val);
+  }
+  virtual const Literal* opMult(int lhs) const  {
+    std::string string;
+    for (int i = 0; i < lhs; i++){
+      string += val;
+    }
+    const Literal* node = new StringLiteral(string);
+    PoolOfNodes::getInstance().add(node);
+    return node;
+  }
+  virtual const Literal* opMult(float lhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+  virtual const Literal* opMult(std::string lhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+
+  virtual const Literal* operator/(const Literal& rhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+  virtual const Literal* opDiv(float lhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+  virtual const Literal* opDiv(int lhs) const  {
+    throw std::string("Can't do / for string");
+    return nullptr;
+  }
+
+  virtual const Literal* operator%(const Literal& rhs) const {
+    throw std::string("Can't do % for string");
+    return nullptr;
+  }
+  virtual const Literal* opMod(float lhs) const {
+    throw std::string("Can't do % for string");
+    return nullptr;
+  }
+  virtual const Literal* opMod(int lhs) const {
+    throw std::string("Can't do % for string");
+    return nullptr;
+  }
+
+  virtual const Literal* operator^(const Literal& rhs) const {
+    throw std::string("Can't do ** for string");
+    return nullptr;
+  }
+  virtual const Literal* opPow(float lhs) const {
+    throw std::string("Can't do ** for string");
+    return nullptr;
+  }
+  virtual const Literal* opPow(int lhs) const {
+    throw std::string("Can't do ** for string");
+    return nullptr;
+  }
+
+  virtual const Literal* eval() const { 
+    return this; 
+  }
+  virtual void print() const { 
+    std::cout << "STRING: " << val << std::endl; 
+  }
+private:
+  std::string val;
+};
 
 class FloatLiteral: public Literal {
 public:
@@ -78,11 +181,10 @@ public:
     PoolOfNodes::getInstance().add(node);
     return node;
   }
-  // virtual const Literal* opPlus(std::string lhs) const {
-  //   const Literal* node;
-  //   PoolOfNodes::getInstance().add(node);
-  //   return node; 
-  // }
+  virtual const Literal* opPlus(std::string lhs) const  {
+    throw std::string("Can't do float + string");
+    return nullptr;
+  }
 
   virtual const Literal* operator-(const Literal& rhs) const  {
     return rhs.opSubt(val);
@@ -111,11 +213,10 @@ public:
     PoolOfNodes::getInstance().add(node);
     return node;
   }
-  // virtual const Literal* opMult(std::string lhs) const {
-  //   const Literal* node;
-  //   PoolOfNodes::getInstance().add(node);
-  //   return node; 
-  // }
+  virtual const Literal* opMult(std::string lhs) const  {
+    throw std::string("Can't do float * string");
+    return nullptr;
+  }
 
   virtual const Literal* operator/(const Literal& rhs) const  {
     return rhs.opDiv(val);
@@ -192,11 +293,10 @@ public:
     PoolOfNodes::getInstance().add(node);
     return node;
   }
-  // virtual const Literal* opPlus(std::string lhs) const {
-  //   const Literal* node ;
-  //   PoolOfNodes::getInstance().add(node);
-  //   return node; 
-  // }
+  virtual const Literal* opPlus(std::string lhs) const  {
+    throw std::string("Can't do int + string");
+    return nullptr;
+  }
 
   virtual const Literal* operator-(const Literal& rhs) const  {
     return rhs.opSubt(val);
@@ -222,6 +322,15 @@ public:
   }
   virtual const Literal* opMult(int lhs) const  {
     const Literal* node = new IntLiteral(lhs * val);
+    PoolOfNodes::getInstance().add(node);
+    return node;
+  }
+  virtual const Literal* opMult(std::string lhs) const  {
+    std::string string;
+    for (int i = 0; i < val; i++){
+      string += lhs;
+    }
+    const Literal* node = new StringLiteral(string);
     PoolOfNodes::getInstance().add(node);
     return node;
   }
@@ -282,112 +391,3 @@ private:
   int val;
 };
 
-class StringLiteral: public Literal {
-public:
-  StringLiteral(std::string _val): val(_val) {}
-
-  virtual const Literal* operator+(const Literal& rhs) const  {
-    return rhs.opPlus(val);
-  }
-  virtual const Literal* opPlus(std::string lhs) const {
-    const Literal* node = new StringLiteral(val + lhs);
-    PoolOfNodes::getInstance().add(node);
-    return node;
-  }
-  virtual const Literal* opPlus(float lhs) const  { 
-    const Literal* node;
-    PoolOfNodes::getInstance().add(node);
-    return node;
-    }
-  virtual const Literal* opPlus(int lhs) const  { 
-    const Literal* node;
-    PoolOfNodes::getInstance().add(node);
-    return node;
-  }
-
-  virtual const Literal* operator-(const Literal& rhs) const  {
-    const Literal* node;
-    return node;
-  }
-  virtual const Literal* opSubt(float lhs) const  { 
-    const Literal* node;
-    return node;}
-  virtual const Literal* opSubt(int lhs) const  { 
-    const Literal* node;
-    return node;
-  }
-
-  virtual const Literal* operator*(const Literal& rhs) const  {
-    return rhs.opMult(val);
-  }
-  virtual const Literal* opMult(float lhs) const  {
-    const Literal* node;
-    PoolOfNodes::getInstance().add(node);
-    return node;
-  }
-  virtual const Literal* opMult(int lhs) const  {
-    std::string string;
-    for (int i = 0; i < lhs; i++){
-      string += val;
-    }
-    const Literal* node = new StringLiteral(string);
-    PoolOfNodes::getInstance().add(node);
-    return node;
-  }
-  virtual const Literal* opMult(std::string lhs) const {
-    const Literal* node;
-    PoolOfNodes::getInstance().add(node);
-    return node;
-  }
-
-  virtual const Literal* operator/(const Literal& rhs) const  {
-    const Literal* node;
-    return node;  
-    }
-  virtual const Literal* opDiv(float lhs) const  {
-    const Literal* node;
-    return node;
-  }
-  virtual const Literal* opDiv(int lhs) const  {
-    const Literal* node;
-    return node;
-  }
-  virtual const Literal* opDiv(std::string lhs) const {
-    const Literal* node;
-    return node;
-  }
-
-  virtual const Literal* operator%(const Literal& rhs) const {
-    const Literal* node;
-    return node;
-  }
-  virtual const Literal* opMod(float lhs) const {
-    const Literal* node;
-    return node;
-  }
-  virtual const Literal* opMod(int lhs) const {
-    const Literal* node;
-    return node;
-  }
-
-  virtual const Literal* operator^(const Literal& rhs) const {
-    const Literal* node;
-    return node;
-  }
-  virtual const Literal* opPow(float lhs) const {
-    const Literal* node;
-    return node;
-  }
-  virtual const Literal* opPow(int lhs) const {
-    const Literal* node;
-    return node;
-  }
-
-  virtual const Literal* eval() const { 
-    return this; }
-  virtual void print() const { 
-    std::cout << "STRING: " << val << std::endl; 
-  }
-private:
-  std::string val;
-};
