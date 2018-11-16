@@ -154,6 +154,12 @@ public:
     return nullptr;
   }
 
+  // virtual const Literal* operator[](const Literal& rhs) const {
+  //   return rhs.opSlice(val);
+  // }
+
+  //virtual const opSlice(std::string str);
+
   virtual const Literal* eval() const { 
     return this; 
   }

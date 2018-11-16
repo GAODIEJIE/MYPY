@@ -106,3 +106,34 @@ public:
   virtual const Literal* eval() const;
 };
 
+class TernaryNode : public Node {
+public:
+  TernaryNode(Node* one, Node* two, Node* three) : Node(), one(one), two(two), three(three) {}
+  virtual const Literal* eval() const = 0;
+  Node* getOne()  const { return one; }
+  Node* getTwo() const { return two; }
+  Node* getThree() const { return three; }
+  TernaryNode(const TernaryNode&) = delete;
+  TernaryNode& operator=(const TernaryNode&) = delete;
+protected:
+  Node *one;
+  Node *two;
+  Node *three;
+};
+
+class SliceNode : public TernaryNode {
+public:
+  SliceNode(Node* one, Node* two, Node* three) : TernaryNode(one, two, three) { }
+  virtual const Literal* eval() const;
+private:
+  int one;
+  int two;
+  int three;
+};
+
+class StrSlcBinaryNode : public BinaryNode {
+public:
+  StrSlcBinaryNode(Node* left, Node* right) : BinaryNode(left, right) { }
+  virtual const Literal* eval() const;
+};
+

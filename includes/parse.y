@@ -35,7 +35,7 @@
 %type<node> opt_test test opt_IF_ELSE or_test and_test not_test comparison 
 %type<node> expr xor_expr and_expr shift_expr arith_expr term factor power atom
 %type<node> opt_yield_test pick_yield_expr_testlist_comp testlist_comp
-%type<node> plus_STRING
+%type<node> plus_STRING star_trailer trailer subscriptlist subscript opt_test_only opt_sliceop sliceop
  
 
 %start start
@@ -131,7 +131,7 @@ star_SEMI_small_stmt // Used in: simple_stmt, star_SEMI_small_stmt
 	;
 small_stmt // Used in: simple_stmt, star_SEMI_small_stmt
 	: expr_stmt{
-		std::cout << " 0 " << std::endl;
+		std::cout << " 134 " << std::endl;
 	}
 	| print_stmt
 	| del_stmt
@@ -143,21 +143,46 @@ small_stmt // Used in: simple_stmt, star_SEMI_small_stmt
 	| assert_stmt
 	;
 expr_stmt // Used in: small_stmt
-	: SEMI augassign pick_yield_expr_testlist{
-		std::cout << " a " << std::endl;
+	: testlist augassign pick_yield_expr_testlist{
+		if($2 == PLUSEQUAL){
+			$$ = new AddBinaryNode($1, $3);
+		}
+		else if($2 == MINEQUAL){
+			$$ = new SubBinaryNode($1, $3);
+		}
+		else if($2 == STAREQUAL){
+			$$ = new MulBinaryNode($1, $3);
+		}
+		else if($2 == SLASHEQUAL){
+			$$ = new DivBinaryNode($1, $3);
+		}
+		else if($2 == DOUBLESLASHEQUAL){
+			$$ = new dblDivBinaryNode($1, $3);
+		}
+		else if($2 == PERCENTEQUAL){
+			$$ = new ModBinaryNode($1, $3);
+		}
+		$$ = new AsgBinaryNode($1, $$);
+		pool.add($$);
 	}
 	| testlist star_EQUAL{
-		$$ = new AsgBinaryNode($1, $2);
-		pool.add($$);
+		if($2 != 0){
+			$$ = new AsgBinaryNode($1, $2);
+			pool.add($$);
+		}
+		else{
+			$$ = $1;
+		}
+		std::cout << " expr_stmt 157 " << std::endl;
 	}
 	;
 pick_yield_expr_testlist // Used in: expr_stmt, star_EQUAL
 	: yield_expr{
-		std::cout << " b 3" << $1 << std::endl;
+		std::cout << " 156 " << $1 << std::endl;
 	}
 	| testlist{
 		$$ = $1;
-		std::cout << " b 3" << $1 << std::endl;
+		std::cout << "160 " << $1 << std::endl;
 	}
 	;
 star_EQUAL // Used in: expr_stmt, star_EQUAL
@@ -176,21 +201,26 @@ star_EQUAL // Used in: expr_stmt, star_EQUAL
 	;
 augassign // Used in: expr_stmt
 	: PLUSEQUAL { $$ = PLUSEQUAL;}
-	| MINEQUAL { $$ = PLUSEQUAL;}
-	| STAREQUAL { $$ = PLUSEQUAL;}
-	| SLASHEQUAL { $$ = PLUSEQUAL;}
-	| PERCENTEQUAL { $$ = PLUSEQUAL;}
+	| MINEQUAL { $$ = MINEQUAL;}
+	| STAREQUAL { $$ = STAREQUAL;}
+	| SLASHEQUAL { $$ = SLASHEQUAL;}
+	| PERCENTEQUAL { $$ = PERCENTEQUAL;}
 	| AMPEREQUAL { $$ = PLUSEQUAL;}
 	| VBAREQUAL { $$ = PLUSEQUAL;}
 	| CIRCUMFLEXEQUAL { $$ = PLUSEQUAL;}
 	| LEFTSHIFTEQUAL { $$ = PLUSEQUAL;}
 	| RIGHTSHIFTEQUAL { $$ = PLUSEQUAL;}
-	| DOUBLESTAREQUAL { $$ = PLUSEQUAL;}
-	| DOUBLESLASHEQUAL { $$ = PLUSEQUAL;}
+	| DOUBLESTAREQUAL { $$ = DOUBLESTAREQUAL;}
+	| DOUBLESLASHEQUAL { $$ = DOUBLESLASHEQUAL;}
 	;
 print_stmt // Used in: small_stmt
 	: PRINT opt_test{
-		$2 -> eval() -> print();
+		try{
+			$2 -> eval() -> print();
+		}
+		catch(std::string& msg) {
+			std::cout << msg << std::endl;
+		}
 	}
 	| PRINT RIGHTSHIFT test opt_test_2
 	;
@@ -548,7 +578,7 @@ factor // Used in: term, factor, power
 	}
 	| power{
 		$$ = $1;
-		std::cout << "d" << std::endl;
+		std::cout << "power 552" << std::endl;
 	}
 	;
 pick_unop // Used in: factor
@@ -562,12 +592,22 @@ power // Used in: factor
 		pool.add($$);
 	}
 	| atom star_trailer{
-		$$ = $1;
+		if($2 == 0){
+			$$ = $1;
+		}
+		else{
+			$$ = new StrSlcBinaryNode($1, $2);
+			pool.add($$);
+		}
 	}
 	;
 star_trailer // Used in: power, star_trailer
-	: star_trailer trailer
-	| %empty
+	: star_trailer trailer{
+		$$ = $2;
+	}
+	| %empty{
+		$$  = 0;
+	}
 	;
 atom // Used in: power
 	: LPAR opt_yield_test RPAR{
@@ -585,7 +625,7 @@ atom // Used in: power
 	| NAME{
 		$$ = new IdentNode($1);
 		pool.add($$);
-		std::cout << "e" << std::endl;
+		std::cout << "name" << std::endl;
 	}
 	| INTNUMBER{
 		$$ = new IntLiteral($1);
@@ -600,7 +640,6 @@ atom // Used in: power
 	}
 	| plus_STRING{
 		$$ = $1;
-		//$1 ->eval() ->print();
 	}
 	;
 pick_yield_expr_testlist_comp // Used in: opt_yield_test
@@ -644,7 +683,6 @@ plus_STRING // Used in: atom, plus_STRING
 			t += s[i];
 		}
 		$$ = new StringLiteral(t);
-		//$$ ->eval() ->print();
 		pool.add($$);
 		delete [] $1;
 	}
@@ -665,12 +703,16 @@ lambdef // Used in: test
 	;
 trailer // Used in: star_trailer
 	: LPAR opt_arglist RPAR
-	| LSQB subscriptlist RSQB
+	| LSQB subscriptlist RSQB{
+		$$ = $2;
+	}
 	| DOT NAME
 	;
 subscriptlist // Used in: trailer
 	: subscript star_COMMA_subscript COMMA
-	| subscript star_COMMA_subscript
+	| subscript star_COMMA_subscript{
+		$$ = $1;
+	}
 	;
 star_COMMA_subscript // Used in: subscriptlist, star_COMMA_subscript
 	: star_COMMA_subscript COMMA subscript
@@ -678,20 +720,42 @@ star_COMMA_subscript // Used in: subscriptlist, star_COMMA_subscript
 	;
 subscript // Used in: subscriptlist, star_COMMA_subscript
 	: DOT DOT DOT
-	| test
-	| opt_test_only COLON opt_test_only opt_sliceop
+	| test{
+		$$ = $1;
+	}
+	| opt_test_only COLON opt_test_only opt_sliceop{
+		if($1 == 0 && $3 == 0 && $4 ==0){
+			$$ = new SliceNode(0, 0, 0);
+		}
+		else{
+			$$ = new SliceNode($1, $3, $4);
+		}
+		pool.add($$);
+	}
 	;
 opt_test_only // Used in: subscript
-	: test
-	| %empty
+	: test{
+		$$ = $1;
+	}
+	| %empty{
+		$$ = 0;
+	}
 	;
 opt_sliceop // Used in: subscript
-	: sliceop
-	| %empty
+	: sliceop{
+		$$ = $1;
+	}
+	| %empty{
+		$$ = 0;
+	}
 	;
 sliceop // Used in: opt_sliceop
-	: COLON test
-	| COLON
+	: COLON test{
+		$$ = $2;
+	}
+	| COLON{
+		$$ = 0;
+	}
 	;
 exprlist // Used in: del_stmt, for_stmt, list_for, comp_for
 	: expr star_COMMA_expr COMMA
@@ -705,8 +769,7 @@ testlist // Used in: expr_stmt, pick_yield_expr_testlist, return_stmt, for_stmt,
 	: test star_COMMA_test COMMA
 	| test star_COMMA_test{
 		$$ = $1;
-		//if($1!= nullptr) {$1 -> eval() -> print();}
-		std::cout << "b 2" << $1 <<std::endl;
+		//std::cout << "710 " << $1 <<std::endl;
 	}
 	;
 dictorsetmaker // Used in: opt_dictorsetmaker

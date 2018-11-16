@@ -116,3 +116,23 @@ const Literal* PowBinaryNode::eval() const {
   const Literal* y = right->eval();
   return ((*x)^(*y));
 }
+
+const Literal* SliceNode::eval() const { 
+  if (!one || !two || !three) {
+    throw std::string("error");
+  }
+  const Literal* val;
+  return val;
+}
+
+const Literal* StrSlcBinaryNode::eval() const { 
+  if (!left || !right) {
+    throw std::string("string slice error");
+  }
+  //transform value
+  const Literal* l = left->eval();
+  const Literal* r = right->eval();
+  return l; //fake
+  //return (*l)[(*r)];
+  
+}
