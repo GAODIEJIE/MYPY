@@ -572,7 +572,7 @@ static const yytype_uint16 yyrline[] =
      583,   586,   590,   604,   607,   612,   615,   618,   621,   624,
      629,   634,   638,   641,   646,   647,   652,   655,   660,   661,
      664,   665,   668,   679,   691,   692,   695,   696,   701,   702,
-     705,   706,   709,   712,   713,   718,   719,   722,   723,   732,
+     705,   706,   709,   712,   713,   718,   719,   722,   723,   731,
      740,   743,   749,   752,   758,   761,   767,   768,   771,   772,
      775,   776,   781,   782,   785,   786,   789,   790,   793,   794,
      797,   798,   801,   802,   805,   808,   809,   812,   813,   816,
@@ -2542,21 +2542,21 @@ yyreduce:
   case 258:
 #line 723 "includes/parse.y" /* yacc.c:1646  */
     {
-		Literal* l = new IntLiteral(0);
-		Literal* ll = new IntLiteral(NULL);
-		(yyval.node) = new SliceNode((yyvsp[0].node), l, ll);
+		Node* l = new IntLiteral(0);
+		(yyval.node) = new SliceNode((yyvsp[0].node), l, l, l);
 		pool.add((yyval.node));
 		LINENO;
 		std::cout << "subscript" << (yyval.node) << std::endl;
 
 	}
-#line 2554 "parse.tab.c" /* yacc.c:1646  */
+#line 2553 "parse.tab.c" /* yacc.c:1646  */
     break;
 
   case 259:
-#line 732 "includes/parse.y" /* yacc.c:1646  */
+#line 731 "includes/parse.y" /* yacc.c:1646  */
     {
-		(yyval.node) = new SliceNode((yyvsp[-3].node), (yyvsp[-1].node), (yyvsp[0].node));
+		Node* l = new IntLiteral(1);
+		(yyval.node) = new SliceNode((yyvsp[-3].node), (yyvsp[-1].node), (yyvsp[0].node), l);
 		pool.add((yyval.node));
 		LINENO;
 		std::cout << "subscript" << (yyval.node) << std::endl;

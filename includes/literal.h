@@ -154,7 +154,7 @@ public:
     return nullptr;
   }
 
-  Literal* Slice(const IntLiteral* st, const IntLiteral* ed, const IntLiteral* std) const;
+  Literal* Slice(const IntLiteral* st, const IntLiteral* ed, const IntLiteral* std, const IntLiteral* colon) const;
 
   virtual const Literal* eval() const { 
     return this; 

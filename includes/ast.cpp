@@ -131,7 +131,7 @@ const Literal* StrSlcNode::eval() const {
   //transform value
   const StringLiteral* ident = static_cast<const StringLiteral*>(Ident->eval());
   const SliceNode* slice = static_cast<SliceNode*>(Slice);
-  Literal* val = ident->Slice(slice->getstart(),slice->getend(),slice->getstride());
+  Literal* val = ident->Slice(slice->getstart(),slice->getend(),slice->getstride(), slice->getcolon());
   return val;
   //return (*i)[(*s)];
   

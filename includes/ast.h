@@ -108,15 +108,18 @@ public:
 
 class SliceNode : public Node {
 public:
-  SliceNode(Node* st, Node* ed,  Node* std) : Node(), start(st), end(ed), stride(std) { }
+  SliceNode(Node* st, Node* colon) : Node(), start(st), colon(colon) { }
+  SliceNode(Node* st, Node* ed,  Node* std, Node* colon) : Node(), start(st), end(ed), stride(std), colon(colon) { }
   virtual const Literal* eval() const;
   IntLiteral* getstart()  const { return static_cast<IntLiteral*>(start); }
   IntLiteral* getend() const { return static_cast<IntLiteral*>(end); }
   IntLiteral* getstride() const { return static_cast<IntLiteral*>(stride); }
+  IntLiteral* getcolon() const { return static_cast<IntLiteral*>(colon); }
 protected:
   Node *start;
   Node *end;
   Node *stride;
+  Node* colon;
 };
 
 class StrSlcNode : public Node {

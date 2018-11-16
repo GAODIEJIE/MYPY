@@ -721,16 +721,16 @@ star_COMMA_subscript // Used in: subscriptlist, star_COMMA_subscript
 subscript // Used in: subscriptlist, star_COMMA_subscript
 	: DOT DOT DOT
 	| test{
-		Literal* l = new IntLiteral(0);
-		Literal* ll = new IntLiteral(NULL);
-		$$ = new SliceNode($1, l, ll);
+		Node* l = new IntLiteral(0);
+		$$ = new SliceNode($1, l);
 		pool.add($$);
 		LINENO;
 		std::cout << "subscript" << $$ << std::endl;
 
 	}
 	| opt_test_only COLON opt_test_only opt_sliceop{
-		$$ = new SliceNode($1, $3, $4);
+		Node* l = new IntLiteral(1);
+		$$ = new SliceNode($1, $3, $4, l);
 		pool.add($$);
 		LINENO;
 		std::cout << "subscript" << $$ << std::endl;
