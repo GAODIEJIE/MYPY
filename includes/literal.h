@@ -154,11 +154,7 @@ public:
     return nullptr;
   }
 
-  // virtual const Literal* operator[](const Literal& rhs) const {
-  //   return rhs.opSlice(val);
-  // }
-
-  //virtual const opSlice(std::string str);
+  Literal* Slice(const IntLiteral* st, const IntLiteral* ed, const IntLiteral* std) const;
 
   virtual const Literal* eval() const { 
     return this; 
@@ -392,6 +388,10 @@ public:
   virtual const Literal* eval() const { return this; }
   virtual void print() const { 
     std::cout << "INT: " << val << std::endl; 
+  }
+
+  const int getVal() const {
+    return val;
   }
 private:
   int val;

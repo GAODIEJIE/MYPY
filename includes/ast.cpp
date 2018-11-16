@@ -118,21 +118,21 @@ const Literal* PowBinaryNode::eval() const {
 }
 
 const Literal* SliceNode::eval() const { 
-  if (!one || !two || !three) {
+  if (!start || !end || !stride) {
     throw std::string("error");
   }
-  const Literal* val;
-  return val;
+  return nullptr;
 }
 
-const Literal* StrSlcBinaryNode::eval() const { 
-  if (!left || !right) {
+const Literal* StrSlcNode::eval() const { 
+  if (!Ident || !Slice) {
     throw std::string("string slice error");
   }
   //transform value
-  const Literal* l = left->eval();
-  const Literal* r = right->eval();
-  return l; //fake
-  //return (*l)[(*r)];
+  const StringLiteral* ident = static_cast<const StringLiteral*>(Ident->eval());
+  const SliceNode* slice = static_cast<SliceNode*>(Slice);
+  Literal* val = ident->Slice(slice->getstart(),slice->getend(),slice->getstride());
+  return val;
+  //return (*i)[(*s)];
   
 }

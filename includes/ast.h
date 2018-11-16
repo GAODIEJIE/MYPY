@@ -106,34 +106,25 @@ public:
   virtual const Literal* eval() const;
 };
 
-class TernaryNode : public Node {
+class SliceNode : public Node {
 public:
-  TernaryNode(Node* one, Node* two, Node* three) : Node(), one(one), two(two), three(three) {}
-  virtual const Literal* eval() const = 0;
-  Node* getOne()  const { return one; }
-  Node* getTwo() const { return two; }
-  Node* getThree() const { return three; }
-  TernaryNode(const TernaryNode&) = delete;
-  TernaryNode& operator=(const TernaryNode&) = delete;
+  SliceNode(Node* st, Node* ed,  Node* std) : Node(), start(st), end(ed), stride(std) { }
+  virtual const Literal* eval() const;
+  IntLiteral* getstart()  const { return static_cast<IntLiteral*>(start); }
+  IntLiteral* getend() const { return static_cast<IntLiteral*>(end); }
+  IntLiteral* getstride() const { return static_cast<IntLiteral*>(stride); }
 protected:
-  Node *one;
-  Node *two;
-  Node *three;
+  Node *start;
+  Node *end;
+  Node *stride;
 };
 
-class SliceNode : public TernaryNode {
+class StrSlcNode : public Node {
 public:
-  SliceNode(Node* one, Node* two, Node* three) : TernaryNode(one, two, three) { }
+  StrSlcNode(Node* Ident, Node* Slice) :Node(),Ident(Ident), Slice(Slice) {}
   virtual const Literal* eval() const;
-private:
-  int one;
-  int two;
-  int three;
-};
-
-class StrSlcBinaryNode : public BinaryNode {
-public:
-  StrSlcBinaryNode(Node* left, Node* right) : BinaryNode(left, right) { }
-  virtual const Literal* eval() const;
+protected:
+  Node *Ident;
+  Node *Slice;
 };
 

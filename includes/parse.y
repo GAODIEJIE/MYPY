@@ -2,6 +2,7 @@
 %{
 	#include "includes/ast.h"
 	#include <string>
+	#define LINENO std::cout<<"line: "<<__LINE__
 	int yylex (void);
 	extern char *yytext;
 	void yyerror (const char *);
@@ -131,7 +132,6 @@ star_SEMI_small_stmt // Used in: simple_stmt, star_SEMI_small_stmt
 	;
 small_stmt // Used in: simple_stmt, star_SEMI_small_stmt
 	: expr_stmt{
-		std::cout << " 134 " << std::endl;
 	}
 	| print_stmt
 	| del_stmt
@@ -173,16 +173,13 @@ expr_stmt // Used in: small_stmt
 		else{
 			$$ = $1;
 		}
-		std::cout << " expr_stmt 157 " << std::endl;
 	}
 	;
 pick_yield_expr_testlist // Used in: expr_stmt, star_EQUAL
 	: yield_expr{
-		std::cout << " 156 " << $1 << std::endl;
 	}
 	| testlist{
 		$$ = $1;
-		std::cout << "160 " << $1 << std::endl;
 	}
 	;
 star_EQUAL // Used in: expr_stmt, star_EQUAL
@@ -231,6 +228,7 @@ star_COMMA_test // Used in: star_COMMA_test, opt_test, listmaker, testlist_comp,
 opt_test // Used in: print_stmt
 	: test star_COMMA_test opt_COMMA{
 		$$ = $1;
+		std::cout << "opt_test 227" << std::endl;
 	}
 	| %empty{
 		$$ = nullptr;
@@ -432,7 +430,6 @@ old_lambdef // Used in: old_test
 test // Used in: opt_EQUAL_test, print_stmt, star_COMMA_test, opt_test, plus_COMMA_test, raise_stmt, opt_COMMA_test, opt_test_3, exec_stmt, assert_stmt, if_stmt, star_ELIF, while_stmt, with_item, except_clause, opt_AS_COMMA, opt_IF_ELSE, listmaker, testlist_comp, lambdef, subscript, opt_test_only, sliceop, testlist, dictorsetmaker, star_test_COLON_test, opt_DOUBLESTAR_test, pick_argument, argument, testlist1
 	: or_test opt_IF_ELSE{
 		$$ = $1;
-		std::cout << "b 1" << std::endl;
 	}
 	| lambdef{
 		$$ = nullptr;
@@ -518,7 +515,6 @@ pick_LEFTSHIFT_RIGHTSHIFT // Used in: shift_expr
 arith_expr // Used in: shift_expr, arith_expr
 	: term{
 		$$ = $1;
-		std::cout << "b" << std::endl;
 	}
 	| arith_expr pick_PLUS_MINUS term{
 		if($2 == PLUS){
@@ -538,7 +534,7 @@ pick_PLUS_MINUS // Used in: arith_expr  + -
 term // Used in: arith_expr, term
 	: factor{
 		$$ = $1;
-		std::cout << "c" << std::endl;
+		std::cout << "term 535" << std::endl;
 	}
 	| term pick_multop factor{
 		if($2 == STAR){
@@ -578,7 +574,7 @@ factor // Used in: term, factor, power
 	}
 	| power{
 		$$ = $1;
-		std::cout << "power 552" << std::endl;
+		std::cout << "factor 552" << std::endl;
 	}
 	;
 pick_unop // Used in: factor
@@ -596,8 +592,11 @@ power // Used in: factor
 			$$ = $1;
 		}
 		else{
-			$$ = new StrSlcBinaryNode($1, $2);
+			$$ = new StrSlcNode($1, $2);
 			pool.add($$);
+			std::cout << "power 594 " <<$1 << $2 << std::endl;
+			$1->eval()->print();
+			//$2->eval()->print();
 		}
 	}
 	;
@@ -625,11 +624,12 @@ atom // Used in: power
 	| NAME{
 		$$ = new IdentNode($1);
 		pool.add($$);
-		std::cout << "name" << std::endl;
+		//std::cout << "name" << std::endl;
 	}
 	| INTNUMBER{
 		$$ = new IntLiteral($1);
 		pool.add($$);
+		//$$->eval()-> print();
 	}
 	| FLOATNUMBER{
 		$$ = new FloatLiteral($1);
@@ -721,16 +721,19 @@ star_COMMA_subscript // Used in: subscriptlist, star_COMMA_subscript
 subscript // Used in: subscriptlist, star_COMMA_subscript
 	: DOT DOT DOT
 	| test{
-		$$ = $1;
+		Literal* l = new IntLiteral(0);
+		Literal* ll = new IntLiteral(NULL);
+		$$ = new SliceNode($1, l, ll);
+		pool.add($$);
+		LINENO;
+		std::cout << "subscript" << $$ << std::endl;
+
 	}
 	| opt_test_only COLON opt_test_only opt_sliceop{
-		if($1 == 0 && $3 == 0 && $4 ==0){
-			$$ = new SliceNode(0, 0, 0);
-		}
-		else{
-			$$ = new SliceNode($1, $3, $4);
-		}
+		$$ = new SliceNode($1, $3, $4);
 		pool.add($$);
+		LINENO;
+		std::cout << "subscript" << $$ << std::endl;
 	}
 	;
 opt_test_only // Used in: subscript
@@ -738,7 +741,8 @@ opt_test_only // Used in: subscript
 		$$ = $1;
 	}
 	| %empty{
-		$$ = 0;
+		$$ = new IntLiteral(NULL);
+		pool.add($$);
 	}
 	;
 opt_sliceop // Used in: subscript
@@ -746,7 +750,8 @@ opt_sliceop // Used in: subscript
 		$$ = $1;
 	}
 	| %empty{
-		$$ = 0;
+		$$ = new IntLiteral(NULL);
+		pool.add($$);
 	}
 	;
 sliceop // Used in: opt_sliceop
@@ -754,7 +759,8 @@ sliceop // Used in: opt_sliceop
 		$$ = $2;
 	}
 	| COLON{
-		$$ = 0;
+		$$ = new IntLiteral(NULL);
+		pool.add($$);
 	}
 	;
 exprlist // Used in: del_stmt, for_stmt, list_for, comp_for
@@ -769,7 +775,6 @@ testlist // Used in: expr_stmt, pick_yield_expr_testlist, return_stmt, for_stmt,
 	: test star_COMMA_test COMMA
 	| test star_COMMA_test{
 		$$ = $1;
-		//std::cout << "710 " << $1 <<std::endl;
 	}
 	;
 dictorsetmaker // Used in: opt_dictorsetmaker
