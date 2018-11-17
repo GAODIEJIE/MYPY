@@ -111,9 +111,9 @@ public:
   SliceNode(Node* st) : Node(), start(st), end(nullptr), stride(nullptr), nocolon(true) { }
   SliceNode(Node* st, Node* ed,  Node* std) : Node(), start(st), end(ed), stride(std), nocolon(false) { }
   virtual const Literal* eval() const;
-  IntLiteral* getstart()  const { return static_cast<IntLiteral*>(start); }
-  IntLiteral* getend() const { return static_cast<IntLiteral*>(end); }
-  IntLiteral* getstride() const { return static_cast<IntLiteral*>(stride); }
+  const IntLiteral* getstart()  const { return static_cast<const IntLiteral*>(start->eval()); }
+  const IntLiteral* getend() const { return static_cast<const IntLiteral*>(end->eval()); }
+  const IntLiteral* getstride() const { return static_cast<const IntLiteral*>(stride->eval()); }
   bool getcolon() const { return nocolon; }
 
   SliceNode(const SliceNode&) = delete;
