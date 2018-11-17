@@ -108,24 +108,30 @@ public:
 
 class SliceNode : public Node {
 public:
-  SliceNode(Node* st, Node* colon) : Node(), start(st), colon(colon) { }
-  SliceNode(Node* st, Node* ed,  Node* std, Node* colon) : Node(), start(st), end(ed), stride(std), colon(colon) { }
+  SliceNode(Node* st) : Node(), start(st), end(nullptr), stride(nullptr), nocolon(true) { }
+  SliceNode(Node* st, Node* ed,  Node* std) : Node(), start(st), end(ed), stride(std), nocolon(false) { }
   virtual const Literal* eval() const;
   IntLiteral* getstart()  const { return static_cast<IntLiteral*>(start); }
   IntLiteral* getend() const { return static_cast<IntLiteral*>(end); }
   IntLiteral* getstride() const { return static_cast<IntLiteral*>(stride); }
-  IntLiteral* getcolon() const { return static_cast<IntLiteral*>(colon); }
+  bool getcolon() const { return nocolon; }
+
+  SliceNode(const SliceNode&) = delete;
+  SliceNode& operator=(const SliceNode&) = delete;
 protected:
   Node *start;
   Node *end;
   Node *stride;
-  Node* colon;
+  bool nocolon;
 };
 
 class StrSlcNode : public Node {
 public:
   StrSlcNode(Node* Ident, Node* Slice) :Node(),Ident(Ident), Slice(Slice) {}
   virtual const Literal* eval() const;
+
+  StrSlcNode(const StrSlcNode&) = delete;
+  StrSlcNode& operator=(const StrSlcNode&) = delete;
 protected:
   Node *Ident;
   Node *Slice;

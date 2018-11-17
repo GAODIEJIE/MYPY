@@ -2,8 +2,6 @@
 #include <iostream>
 #include <string>
 
-//question :判断n超过length的情况
-
 int cycle(int n, int length) {
     if(n < 0)
     {
@@ -15,77 +13,65 @@ int cycle(int n, int length) {
     return n;
 }
 
- Literal* StringLiteral::Slice(const IntLiteral* st, const IntLiteral* ed, const IntLiteral* stp, const IntLiteral* col) const {
+ Literal* StringLiteral::Slice(const IntLiteral* st, const IntLiteral* ed, const IntLiteral* stp, bool nocolon) const {
     Literal* ss;
-    int _start, _end, _step, _col;
     int start, end, step;
     std::string str = "";
-    _start = cycle(st->getVal(), val.size());
-    //_end = cycle(ed->getVal(), val.size());
-    //_step = stp->getVal();
-    _col = col->getVal();
-    if(_col == 0){
-        start = _start;
-        end = _start+1;
+
+    if(nocolon) {
+        if(st) {
+            start = cycle(st->getVal(), val.size());
+            end = start+1;
+        }
+        else {
+            throw std::string("Slice params error");
+        }
         step = 1;
     }
-    else{
-        if(_start == NULL && _end == NULL && _step == NULL){
-        start = 0;
-        end = val.size();
-        step = 1;
-        }
-        else if(_start == NULL && _end == NULL ){
+    else {
+        if(st == NULL && ed == NULL && stp == NULL){
             start = 0;
             end = val.size();
-            step = _step;
+            step = 1;
         }
-        else if(_end == NULL && _step == NULL ){
-            start = _start;
+        else if(st == NULL && ed == NULL ){
+            start = 0;
+            end = val.size();
+            step = stp->getVal();
+        }
+        else if(ed == NULL && stp == NULL ){
+            start = cycle(st->getVal(), val.size());
             end = val.size();
             step = 1;
         }
-        else if(_start == NULL && _step == NULL ){
+        else if(st == NULL && stp == NULL ){
             start = 0;
-            end = _end;
+            end = cycle(ed->getVal(), val.size());
             step = 1;
         }
-        else if(_start == NULL && _end == 0 &&  _step == NULL ){
+        else if(st == NULL ){
             start = 0;
-            end = _end;
-            step = 1;
+            end = cycle(ed->getVal(), val.size());
+            step = stp->getVal();;
         }
-        else if(_start == NULL ){
-            start = 0;
-            end = _end;
-            step = _step;
-        }
-        else if(_end == NULL ){
-            start = _start;
+        else if(ed == NULL ){
+            start = cycle(st->getVal(), val.size());
             end = val.size();
-            step = _step;
+            step = stp->getVal();
         }
-        else if(_end == 0 ){ //no colon
-            start = _start;
-            end = _start+1;
-            step = 1;
-        }
-        else if(_step == NULL ){
-            start = _start;
-            end = _end;
+        else if(stp == NULL ){
+            start = cycle(st->getVal(), val.size());
+            end = cycle(ed->getVal(), val.size());
             step = 1;
         }
         else{
-            start = _start;
-            end = _end;
-            step = _step;
+            start = cycle(st->getVal(), val.size());
+            end = cycle(ed->getVal(), val.size());
+            step = stp->getVal();
         }
     }
-    std::cout << "++++++++++++++++ " << val <<std::endl;
-    std::cout << "++++++++++++++++ " << start << " " << end << " " << step <<std::endl;
     
     int i;
-    int j = 0;
     if(step < 0 && start > end){
         for(i = start; i < end; i+=step){
             str.push_back(val[i]);
@@ -93,18 +79,14 @@ int cycle(int n, int length) {
         ss = new StringLiteral(str);
     }
     else if(step > 0 && start < end){
-        for(i = start, j = 0; i < end; i+=step, j++){
+        for(i = start; i < end; i+=step){
             str.push_back(val[i]);
-            std::cout << "++++++++++++++++ " << str[j] << " " << val[i] <<std::endl;
         }
-        std::cout << "++++++++++++++++ " << str <<std::endl;
         ss = new StringLiteral(str);
-        std::cout << "++++++++++++++++ " << str.size() <<std::endl;
     }
     else{
         ss = new StringLiteral("");
     }
-    std::cout << "slice function test" << start << std::endl;
     return ss;
-  }
+}
 

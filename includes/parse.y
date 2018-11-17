@@ -2,7 +2,7 @@
 %{
 	#include "includes/ast.h"
 	#include <string>
-	#define LINENO std::cout<<"line: "<<__LINE__
+	#define LINENO std::cout<<"Line: "<<__LINE__ << " - "
 	int yylex (void);
 	extern char *yytext;
 	void yyerror (const char *);
@@ -228,7 +228,6 @@ star_COMMA_test // Used in: star_COMMA_test, opt_test, listmaker, testlist_comp,
 opt_test // Used in: print_stmt
 	: test star_COMMA_test opt_COMMA{
 		$$ = $1;
-		std::cout << "opt_test 227" << std::endl;
 	}
 	| %empty{
 		$$ = nullptr;
@@ -534,7 +533,6 @@ pick_PLUS_MINUS // Used in: arith_expr  + -
 term // Used in: arith_expr, term
 	: factor{
 		$$ = $1;
-		std::cout << "term 535" << std::endl;
 	}
 	| term pick_multop factor{
 		if($2 == STAR){
@@ -574,7 +572,6 @@ factor // Used in: term, factor, power
 	}
 	| power{
 		$$ = $1;
-		std::cout << "factor 552" << std::endl;
 	}
 	;
 pick_unop // Used in: factor
@@ -594,9 +591,6 @@ power // Used in: factor
 		else{
 			$$ = new StrSlcNode($1, $2);
 			pool.add($$);
-			std::cout << "power 594 " <<$1 << $2 << std::endl;
-			$1->eval()->print();
-			//$2->eval()->print();
 		}
 	}
 	;
@@ -624,12 +618,10 @@ atom // Used in: power
 	| NAME{
 		$$ = new IdentNode($1);
 		pool.add($$);
-		//std::cout << "name" << std::endl;
 	}
 	| INTNUMBER{
 		$$ = new IntLiteral($1);
 		pool.add($$);
-		//$$->eval()-> print();
 	}
 	| FLOATNUMBER{
 		$$ = new FloatLiteral($1);
@@ -702,14 +694,14 @@ lambdef // Used in: test
 	| LAMBDA COLON test
 	;
 trailer // Used in: star_trailer
-	: LPAR opt_arglist RPAR
+	: LPAR opt_arglist RPAR { $$ = nullptr; }
 	| LSQB subscriptlist RSQB{
 		$$ = $2;
 	}
-	| DOT NAME
+	| DOT NAME { $$ = nullptr; }
 	;
 subscriptlist // Used in: trailer
-	: subscript star_COMMA_subscript COMMA
+	: subscript star_COMMA_subscript COMMA { $$ = $1; }
 	| subscript star_COMMA_subscript{
 		$$ = $1;
 	}
@@ -719,21 +711,14 @@ star_COMMA_subscript // Used in: subscriptlist, star_COMMA_subscript
 	| %empty
 	;
 subscript // Used in: subscriptlist, star_COMMA_subscript
-	: DOT DOT DOT
+	: DOT DOT DOT { $$ = nullptr; }
 	| test{
-		Node* l = new IntLiteral(0);
-		$$ = new SliceNode($1, l);
+		$$ = new SliceNode($1);
 		pool.add($$);
-		LINENO;
-		std::cout << "subscript" << $$ << std::endl;
-
 	}
 	| opt_test_only COLON opt_test_only opt_sliceop{
-		Node* l = new IntLiteral(1);
-		$$ = new SliceNode($1, $3, $4, l);
+		$$ = new SliceNode($1, $3, $4);
 		pool.add($$);
-		LINENO;
-		std::cout << "subscript" << $$ << std::endl;
 	}
 	;
 opt_test_only // Used in: subscript
@@ -741,8 +726,7 @@ opt_test_only // Used in: subscript
 		$$ = $1;
 	}
 	| %empty{
-		$$ = new IntLiteral(NULL);
-		pool.add($$);
+		$$ = nullptr;
 	}
 	;
 opt_sliceop // Used in: subscript
@@ -750,8 +734,7 @@ opt_sliceop // Used in: subscript
 		$$ = $1;
 	}
 	| %empty{
-		$$ = new IntLiteral(NULL);
-		pool.add($$);
+		$$ = nullptr;
 	}
 	;
 sliceop // Used in: opt_sliceop
@@ -759,8 +742,7 @@ sliceop // Used in: opt_sliceop
 		$$ = $2;
 	}
 	| COLON{
-		$$ = new IntLiteral(NULL);
-		pool.add($$);
+		$$ = nullptr;
 	}
 	;
 exprlist // Used in: del_stmt, for_stmt, list_for, comp_for
