@@ -361,7 +361,7 @@ public:
   }
   virtual const Literal* opMod(int lhs) const {
     if( val == 0 ) throw std::string("% error");
-    const Literal* node = new IntLiteral((lhs - val * floor(lhs / val)));
+    const Literal* node = new IntLiteral((lhs - val * floor((float)lhs / val)));
     PoolOfNodes::getInstance().add(node);
     return node;
   }

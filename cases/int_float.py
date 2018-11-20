@@ -17,11 +17,11 @@ print -1/2
 #print 1/0 #error
 print 1//2
 print 1//2.0
-print -1//2
+print -1//2 #
 print -1//2.0
 #print -1//0 #error
 print 1%2
-print -1%2
+print -1%2 #
 print 1%2.0
 print 1%-2.0
 print 0**0

@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+####THANKS FOR ZONGMING##########
+
 ###========ReadMe=============###
 #1. string is output with prefix: "STR: "
 # make sure the prefix of output of your string is: "STR: ". If you set it anything else,
@@ -67,14 +69,14 @@ def compareResults(myPath, pyPath, removeOutputs=True):
          flag = False
     else:
         for lineIdx in range(len(myContent)):
-            myList = myContent[lineIdx].split(":")
+            myList = myContent[lineIdx].split(":",1)
             pyList = pyContent[lineIdx]
             myValue = myList[1][1:] # skip the first " "(space) after ":"
-            if myList[0] == "STR":
+            if myList[0] == "STRING":
                 pyValue = pyList
                 if myValue != pyValue:
                     flag = False
-                    break
+                    print lineIdx, " is different!\n", myValue, pyValue
             else:   # deal with floats/ints
                 myValueFloat = float(myValue)
                 pyValueFloat = float(pyList)
@@ -108,7 +110,7 @@ for x in files:
     if fnmatch.fnmatch(x, "*.py"):
         rflag, myPath, pyPath = runTestCase(testDir, x)
         if (rflag==0) and checkFileExistence(myPath, pyPath):
-            cFlag = compareResults(myPath, pyPath, removeOutputs=True)
+            cFlag = compareResults(myPath, pyPath, removeOutputs=False)
             if cFlag:
                 print "testcase: {0} passed".format(x)
             else:

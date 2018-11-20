@@ -118,7 +118,7 @@ const Literal* PowBinaryNode::eval() const {
 }
 
 const Literal* SliceNode::eval() const { 
-  if (!start || !end || !stride) {
+  if (!start || !end || !step) {
     throw std::string("error");
   }
   return nullptr;
@@ -131,7 +131,7 @@ const Literal* StrSlcNode::eval() const {
   //transform value
   const StringLiteral* ident = static_cast<const StringLiteral*>(Ident->eval());
   const SliceNode* slice = static_cast<SliceNode*>(Slice);
-  Literal* val = ident->Slice(slice->getstart(),slice->getend(),slice->getstride(), slice->getcolon());
+  Literal* val = ident->Slice(slice->getstart(),slice->getend(),slice->getstep(), slice->getcolon());
   return val;
   //return (*i)[(*s)];
   

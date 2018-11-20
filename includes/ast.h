@@ -108,12 +108,26 @@ public:
 
 class SliceNode : public Node {
 public:
-  SliceNode(Node* st) : Node(), start(st), end(nullptr), stride(nullptr), nocolon(true) { }
-  SliceNode(Node* st, Node* ed,  Node* std) : Node(), start(st), end(ed), stride(std), nocolon(false) { }
+  SliceNode(Node* st) : Node(), start(st), end(nullptr), step(nullptr), nocolon(true) { }
+  SliceNode(Node* st, Node* ed,  Node* stp) : Node(), start(st), end(ed), step(stp), nocolon(false) { }
   virtual const Literal* eval() const;
-  const IntLiteral* getstart()  const { return static_cast<const IntLiteral*>(start->eval()); }
-  const IntLiteral* getend() const { return static_cast<const IntLiteral*>(end->eval()); }
-  const IntLiteral* getstride() const { return static_cast<const IntLiteral*>(stride->eval()); }
+  const IntLiteral* getstart()  const { 
+    if(start != NULL)
+      return static_cast<const IntLiteral*>(start->eval()); 
+    else
+      return NULL;
+  }
+  const IntLiteral* getend() const { 
+    if(end != NULL)
+      return static_cast<const IntLiteral*>(end->eval()); 
+    else
+      return NULL; 
+  }
+  const IntLiteral* getstep() const { 
+    if(step != NULL)
+      return static_cast<const IntLiteral*>(step->eval()); 
+    else
+      return NULL;  }
   bool getcolon() const { return nocolon; }
 
   SliceNode(const SliceNode&) = delete;
@@ -121,7 +135,7 @@ public:
 protected:
   Node *start;
   Node *end;
-  Node *stride;
+  Node *step;
   bool nocolon;
 };
 

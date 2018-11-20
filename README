@@ -1,1 +1,46 @@
-This version of mypy is leak free, thanks to Timothy Campbell
+Name:Diejie Gao
+
+Course no: CpSc 8270
+
+Clemson Email Address:diejieg@clemson.edu
+
+
+Project no: 4
+
+Project due date:Nov. 16, 2018, 8 a.m.
+
+Project description: build an AST representation of the program and use AST to interpret the expression
+
+
+
+What I have accomplished to implement AST:
+1. learn python( the rule of the / // % ** of int and float, the rule of * + of string)
+2. understand the construct of python grammar in parse.y (like trailer for slice).And I change the NUMBER to INTNUMBER and   FLOATNUMBER
+3. learn the construction of Node and literal for Int and float. add class and method in ast.h and Literal.h.
+   Build StringLiteral and slice method for string.
+4. new some node or literal in parse.y.
+   add class and method in ast.h and Literal.h to implement the * / // % ** 
+   design the stringliteral, slice(), SliceNode and StrslcNode for string to + * slice(I feel like "list" is help for slice and I will try to finish it if I have time)
+5. write int_float.py and string.py in ./cases as a simple example including construct to compute the complexity, which helps me to code and test
+6. compare the result from python and mypy by eyes.
+  (Thanks for test.py from zongming, I add some code to show the different line to help me debug. It is really helpful.
+   However there is a bug in line #72, we should just split one time because there could be some ':' show in string we print)
+7. just run test.py and all case pass
+
+The easiest part of this project, including what language
+construct was the easiest to implement:
+The easiest part is + - of int and float
+ 
+
+
+Problems that I had in completing this project, including what
+Python language construct caused the most difficulty:
+There are a lot of problems. The most difficult one for me is designing stringliteral, slice(), SliceNode and StrslcNode. 
+And some operations confuse me.
+-1/2 = -1 not 0 because of the floor. It is easy to solve.
+-2**0 = -1 not 1 and I feel like it is difficult to solve because of the grammar. the MinusUnary is higher than power in the ast tree. So we will do 2**0=1 first and do MinusUnary(1) =-1. And it is not good to change the grammar.
+but I can do (-2) **0 =1
+1%-0.1 = 0 But it equals to -5.55111512313e-17 in python and -1.49012e-08 in mypy because of computation error. I have no idea how to figure it out.
+
+
+
